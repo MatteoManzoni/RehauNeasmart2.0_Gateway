@@ -211,7 +211,6 @@ func (rehauHandler *RehauNeaSmartHandler) HandleHoldingRegisters(req *modbus.Hol
 	var regAddr uint16
 
 	if req.UnitId != 0 && req.UnitId != rehauHandler.slave_id {
-		err = modbus.ErrAcknowledge
 		return
 	}
 
@@ -223,10 +222,8 @@ func (rehauHandler *RehauNeaSmartHandler) HandleHoldingRegisters(req *modbus.Hol
 		if req.IsWrite {
 			rehauHandler.readingRegs[regAddr] = req.Args[i]
 			res = append(res, rehauHandler.readingRegs[regAddr])
-			fmt.Printf("Unit ID %d was requested set reg#%d to %v\n", req.UnitId, regAddr, rehauHandler.readingRegs[regAddr])
 		} else {
 			res = append(res, rehauHandler.writingRegs[regAddr])
-			fmt.Printf("Unit ID %d was requested get reg#%d to %v\n", req.UnitId, regAddr, rehauHandler.writingRegs[regAddr])
 		}
 	}
 	return
