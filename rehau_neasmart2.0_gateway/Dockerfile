@@ -21,7 +21,7 @@ RUN  if [ "${BUILD_ARCH}" = "armv7" ]; then \
      elif [ "${BUILD_ARCH}" = "amd64" ]; then \
          export GO_ARCH="amd64"; \
      else \
-         exit 1 \
+         exit 1; \
      fi && \
     curl -L -f "https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" \
     | tar Jxvf - -C /usr/local && \
