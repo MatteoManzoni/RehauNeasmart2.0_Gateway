@@ -12,7 +12,7 @@ HEALTHCHECK --interval=5m --timeout=3s \
 
 RUN  if [ "${BUILD_ARCH}" = "armv7" ]; then \
          export GO_ARCH="armv6l"; \
-     elif [ "${BUILD_ARCH}" = "armvhf" ]; then \
+     elif [ "${BUILD_ARCH}" = "armhf" ]; then \
          export GO_ARCH="armv6l"; \
      elif [ "${BUILD_ARCH}" = "aarch64" ]; then \
          export GO_ARCH="arm64"; \
