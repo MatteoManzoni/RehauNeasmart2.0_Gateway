@@ -15,7 +15,7 @@ RUN if [ "${BUILD_ARCH}" = "armv7" ]; then \
      else \
          export GO_ARCH="${BUILD_ARCH}"; \
      fi && \
-    curl -L -f -s "https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" \
+    curl -L -f "https://go.dev/dl/go${GO_VERSION}.linux-${GO_ARCH}.tar.gz" \
     | tar Jxvf - -C /usr/local && \
     go build -ldflags="-w -s" -o /rehau_gw /app
 
