@@ -442,6 +442,6 @@ func (rehauHandler *RehauNeaSmartHandler) HandleGETExtraPumps(c echo.Context) er
 	})
 }
 
-func (rehauHandler *RehauNeaSmartHandler) HandleHealth(c echo.Context) error {
+func (rehauHandler *RehauNeaSmartHandler) HandleGETHealth(c echo.Context) error {
 	return c.String(http.StatusOK, "OK")
 }
