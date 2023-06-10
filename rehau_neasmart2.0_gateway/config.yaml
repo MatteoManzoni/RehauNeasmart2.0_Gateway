@@ -1,0 +1,20 @@
+name: Example add-on
+version: "1.2.0"
+slug: rehau_neasmart2.0_gateway
+description: Example add-on
+url: "https://github.com/MatteoManzoni/RehauNeasmart2.0_Gateway/blob/main/rehau_neasmart2.0_gateway"
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+init: false
+map:
+  - share:rw
+watchdog: tcp://[HOST]:502
+startup: services
+image: "ghcr.io/MatteoManzoni/{arch}-rehau_neasmart2_gateway"
+ports:
+  502/tcp: 502
+  8080/tcp: 8080

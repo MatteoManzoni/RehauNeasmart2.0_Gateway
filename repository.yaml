@@ -1,4 +1,3 @@
-# https://developers.home-assistant.io/docs/add-ons/repository#repository-configuration
-name: Example Home Assistant add-on repository
-url: 'https://github.com/home-assistant/addons-example'
-maintainer: Awesome Maintainer <awesome@example.com>
+name: Rehau ModbusTCP slave GW for Homeassistant
+url: 'https://github.com/MatteoManzoni/RehauNeasmart2.0_Gateway'
+maintainer: Matteo Manzoni <manzoni.matteo@mailfence.com>
