@@ -7,6 +7,9 @@ ARG GO_VERSION
 
 COPY rootfs /app
 
+HEALTHCHECK --interval=5m --timeout=3s \
+    CMD curl -f http://localhost:8080/healthcheck || exit 1
+
 RUN  if [ "${BUILD_ARCH}" = "armv7" ]; then \
          export GO_ARCH="armv6l"; \
      elif [ "${BUILD_ARCH}" = "armvhf" ]; then \

@@ -143,6 +143,8 @@ func main() {
 	echoServer.POST("/status", rehauHandler.HandlePOSTStatus)
 	echoServer.POST("/zones/:base_id/:zone_id", rehauHandler.HandlePOSTZone)
 
+	echoServer.GET("/health", rehauHandler.HandleGETHealth)
+
 	echoServer.Logger.Fatal(echoServer.Start(":8080"))
 
 	return
@@ -438,4 +440,8 @@ func (rehauHandler *RehauNeaSmartHandler) HandleGETExtraPumps(c echo.Context) er
 	return c.JSON(http.StatusOK, Pump{
 		PumpStatus: pumpStatus,
 	})
+}
+
+func (rehauHandler *RehauNeaSmartHandler) HandleHealth(c echo.Context) error {
+	return c.String(http.StatusOK, "OK")
 }
