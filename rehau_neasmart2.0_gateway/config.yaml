@@ -4,7 +4,6 @@ slug: rehau_neasmart2.0_gateway
 description: Example add-on
 url: "https://github.com/MatteoManzoni/RehauNeasmart2.0_Gateway/blob/main/rehau_neasmart2.0_gateway"
 arch:
-  - armhf
   - armv7
   - aarch64
   - amd64
