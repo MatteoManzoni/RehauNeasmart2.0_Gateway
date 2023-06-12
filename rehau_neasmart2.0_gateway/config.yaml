@@ -11,6 +11,7 @@ arch:
   - i386
 init: false
 uart: true
+apparmor: true
 startup: services
 image: "ghcr.io/matteomanzoni/{arch}-rehau_neasmart2_gateway"
 ports:
