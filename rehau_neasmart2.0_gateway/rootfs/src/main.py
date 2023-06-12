@@ -28,7 +28,7 @@ from sqlitedict import SqliteDict
 app = Flask(__name__)
 
 _logger = logging.getLogger(__name__)
-_logger.setLevel(logging.DEBUG)
+_logger.setLevel(logging.INFO)
 
 
 class LockingPersistentDataBlock(ModbusSequentialDataBlock):
@@ -48,13 +48,15 @@ class LockingPersistentDataBlock(ModbusSequentialDataBlock):
     @classmethod
     def create_lpdb(cls, reg_datastore_path):
         if not os.path.exists(reg_datastore_path):
-            cls.reg_dict = SqliteDict(reg_datastore_path, tablename=const.SQLITEDICT_REGS_TABLE, autocommit=False)
+            _logger.warning("Initialising DB at {}".format(reg_datastore_path))
+            init_dict = SqliteDict(reg_datastore_path, tablename=const.SQLITEDICT_REGS_TABLE, autocommit=False)
             for k in range(0, 65536):
-                cls.reg_dict[k] = 0
-            cls.reg_dict.commit()
-            cls.reg_dict.autocommit = True
-        else:
-            cls.reg_dict = SqliteDict(reg_datastore_path, tablename=const.SQLITEDICT_REGS_TABLE, autocommit=True)
+                init_dict[k] = 0
+            init_dict.commit()
+            init_dict.close()
+
+        _logger.info("Using DB at {}".format(reg_datastore_path))
+        cls.reg_dict = SqliteDict(reg_datastore_path, tablename=const.SQLITEDICT_REGS_TABLE, autocommit=True)
 
         return cls(0x00, list(cls.reg_dict.values()))
 
@@ -421,7 +423,7 @@ if __name__ == "__main__":
     elif server_type == "serial":
         addr = addr
     else:
-        print("Unsupported server type")
+        _logger.critical("Unsupported server type")
         exit(1)
 
     asyncio.run(run_modbus_server(context, addr, server_type))
