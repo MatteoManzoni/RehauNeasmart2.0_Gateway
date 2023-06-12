@@ -199,11 +199,11 @@ def get_mixed_circuit(group_id=None):
             mimetype='application/json'
         )
     data = {
-        "pump_status": context[slave_id].getValues(
+        "pump_running": context[slave_id].getValues(
             const.READ_HR_CODE,
             const.MIXEDGROUP_BASE_REG[group_id] + const.MIXEDGROUP_PUMP_STATE_OFFSET,
-            count=1)[0],
-        "mixing_valve_opening": context[slave_id].getValues(
+            count=1)[0] == 1,
+        "mixing_valve_opening_percentage": context[slave_id].getValues(
             const.READ_HR_CODE,
             const.MIXEDGROUP_BASE_REG[group_id] + const.MIXEDGROUP_VALVE_OPENING_OFFSET,
             count=1)[0],
@@ -314,9 +314,9 @@ def mode():
 def state():
     if request.method == 'GET':
         data = {
-            "status": context[slave_id].getValues(
+            "state": context[slave_id].getValues(
                 const.READ_HR_CODE,
-                const.GLOBAL_OP_STATUS_ADDR,
+                const.GLOBAL_OP_STATE_ADDR,
                 count=1)[0]
         }
         response = app.response_class(
@@ -342,7 +342,7 @@ def state():
             )
         context[slave_id].setValues(
             const.WRITE_HR_CODE,
-            const.GLOBAL_OP_STATUS_ADDR,
+            const.GLOBAL_OP_STATE_ADDR,
             op_state)
         response = app.response_class(
             status=202,
