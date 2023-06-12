@@ -413,7 +413,7 @@ if __name__ == "__main__":
 
     context = setup_server_context(const.DATASTORE_PATH)
 
-    server_thread = threading.Thread(target=app.run, daemon=True)
+    server_thread = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0'}, daemon=True)
     server_thread.start()
 
     if server_type == "tcp":
