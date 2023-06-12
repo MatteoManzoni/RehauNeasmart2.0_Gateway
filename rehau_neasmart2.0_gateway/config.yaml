@@ -1,5 +1,5 @@
 name: Rehau Neasmart 2.0 Gateway
-version: "0.1.0"
+version: "0.1.1"
 slug: rehau_neasmart2.0_gateway
 description: Shim between Rehau Neasmart 2.0 Modbus RTU-Serial/TCP and REST
 url: "https://github.com/MatteoManzoni/RehauNeasmart2.0_Gateway/blob/main/rehau_neasmart2.0_gateway"
