@@ -28,9 +28,9 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
   /data/** rw,
 
   # Start new profile for service
-  /usr/bin/my_program cx -> my_program,
+  /src/main.py cx -> shim_server,
 
-  profile my_program flags=(attach_disconnected,mediate_deleted) {
+  profile shim_server flags=(attach_disconnected,mediate_deleted) {
     #include <abstractions/base>
 
     # Receive signals from S6-Overlay
