@@ -1,7 +1,10 @@
 # Rehau Neasmart 2.0 Gateway Add-On
 
-This addons simulates a Modbus slave through serial or ModbusTCP in order to iteract with a Rehau Neasmart 2.0 system, it exposes a set of RESTful apis to control the systems through an Homeassistant custom component.
-This addon requires a Serial to USB adapter or a ModbusRTU Slave to ModbusTCP adapter. (ModbusRTU over TCP or ModbusRTU over UDP can be supported but are not at this time)
+This Add-On simulates a Modbus slave through serial or ModbusTCP in order to iteract with a Rehau Neasmart 2.0 system, it exposes a set of RESTful apis to control the systems through an Homeassistant custom component.
+
+This Add-On requires a Serial to USB adapter or a ModbusRTU Slave to ModbusTCP adapter. (ModbusRTU over TCP or ModbusRTU over UDP can be supported but are not at this time)
+Something like an ESP or an Arduino works but many cheap off-the-shelf devices work too (eg. [this one I'm using now with PoE and DIN rail mounting](https://www.waveshare.com/wiki/RS485_TO_POE_ETH_(B)))
+
 
 [Add-on documentation](./rehau_neasmart2.0_gateway/DOCS.md)
 
