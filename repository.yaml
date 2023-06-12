@@ -1,3 +1,3 @@
-name: Rehau ModbusTCP slave GW for Homeassistant
+name: Rehau ModbusTCP Slave <> Rest Shim for Homeassistant
 url: 'https://github.com/MatteoManzoni/RehauNeasmart2.0_Gateway'
 maintainer: Matteo Manzoni <manzoni.matteo@mailfence.com>

@@ -1,6 +1,6 @@
-# Home Assistant Add-on: Example add-on
+# Home Assistant Add-on: Rehau Neasmart 2.0 Gateway 
 
-_Example add-on to use as a blueprint for new add-ons._
+_Shim between Modbus and REST for interfacing homeassistant with Rehau Neasmart 2.0 climate control system._
 
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
