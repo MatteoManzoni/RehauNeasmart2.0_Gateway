@@ -6,7 +6,6 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
   # Capabilities
   file,
   signal (send) set=(kill,term,int,hup,cont),
-  network,
 
   # S6-Overlay
   /init ix,
@@ -19,8 +18,7 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
   /etc/cont-init.d/** rwix,
   /etc/cont-finish.d/** rwix,
   /run/{,**} rwk,
-  /dev/** rw,
-  /src/** rx,
+  /dev/tty rw,
 
   # Bashio
   /usr/lib/bashio/** ix,
@@ -37,12 +35,12 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
 
     # Receive signals from S6-Overlay
     signal (receive) peer=*_rehau_neasmart_gateway,
-    file,
-    network,
-    capability net_bind_service,
 
     # Access to options.json and other files within your addon
     /data/** rw,
+
+    # Access to mapped volumes specified in config.json
+    /share/** rw,
 
     # Access required for service functionality
     # Note: List was built by doing the following:
@@ -50,11 +48,10 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
     # 2. Add `complain` as a flag to this profile temporarily and run the addon
     # 3. Review the audit log with `journalctl _TRANSPORT="audit" -g 'apparmor="ALLOWED"'` and add other access as needed
     # Remember to remove the `complain` flag when you are done
-    /usr/bin/** rx,
-    /bin/** rx,
+    /src/** rx,
     /bin/bash rix,
     /bin/echo ix,
     /etc/passwd r,
-    /dev/** rw,
+    /dev/tty rw,
   }
 }
