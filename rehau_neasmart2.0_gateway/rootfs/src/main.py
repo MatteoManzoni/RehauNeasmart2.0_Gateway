@@ -419,12 +419,7 @@ if __name__ == "__main__":
     if server_type == "tcp":
         addr = (addr, port)
     elif server_type == "serial":
-        serial_path_components = os.path.split(addr)
-        if len(serial_path_components) != 2 or serial_path_components[0] != "/dev":
-            print("Wrong serial path {}".format(addr))
-            exit(1)
-
-        addr = "{}/{}".format("/hostdev/", serial_path_components[1])
+        addr = addr
     else:
         print("Unsupported server type")
         exit(1)

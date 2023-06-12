@@ -10,8 +10,7 @@ arch:
   - amd64
   - i386
 init: false
-map:
-  - /dev/:/hostdev/:rw
+uart: true
 startup: services
 image: "ghcr.io/MatteoManzoni/{arch}-rehau_neasmart2_gateway"
 ports:
