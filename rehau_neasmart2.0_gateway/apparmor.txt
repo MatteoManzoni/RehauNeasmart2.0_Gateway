@@ -19,6 +19,7 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
   /etc/cont-finish.d/** rwix,
   /run/{,**} rwk,
   /dev/** rw,
+  /app/** rx,
 
   # Bashio
   /usr/lib/bashio/** ix,
@@ -28,7 +29,7 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
   /data/** rw,
 
   # Start new profile for service
-  /src/main.py cx -> shim_server,
+  /app/main.py cx -> shim_server,
 
   profile shim_server flags=(attach_disconnected,mediate_deleted) {
     #include <abstractions/base>
