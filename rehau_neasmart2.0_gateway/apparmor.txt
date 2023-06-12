@@ -1,13 +1,12 @@
 #include <tunables/global>
 
-profile example flags=(attach_disconnected,mediate_deleted) {
+profile rehau_neasmart2.0_gateway flags=(attach_disconnected,mediate_deleted) {
   #include <abstractions/base>
 
   # Capabilities
   file,
   signal (send) set=(kill,term,int,hup,cont),
 
-  # S6-Overlay
   /init ix,
   /bin/** ix,
   /usr/bin/** ix,
@@ -19,6 +18,7 @@ profile example flags=(attach_disconnected,mediate_deleted) {
   /etc/cont-finish.d/** rwix,
   /run/{,**} rwk,
   /dev/tty rw,
+  /src/** rx,
 
   # Bashio
   /usr/lib/bashio/** ix,
@@ -28,19 +28,19 @@ profile example flags=(attach_disconnected,mediate_deleted) {
   /data/** rw,
 
   # Start new profile for service
-  /usr/bin/my_program cx -> my_program,
+  /src/main.py cx -> main.py,
 
-  profile my_program flags=(attach_disconnected,mediate_deleted) {
+  profile main.py flags=(attach_disconnected,mediate_deleted) {
     #include <abstractions/base>
 
     # Receive signals from S6-Overlay
-    signal (receive) peer=*_example,
+    signal (receive) peer=*_rehau_neasmart2.0_gateway,
 
     # Access to options.json and other files within your addon
     /data/** rw,
 
     # Access to mapped volumes specified in config.json
-    /share/** rw,
+    /hostdev/** rw,
 
     # Access required for service functionality
     # Note: List was built by doing the following:
@@ -48,11 +48,10 @@ profile example flags=(attach_disconnected,mediate_deleted) {
     # 2. Add `complain` as a flag to this profile temporarily and run the addon
     # 3. Review the audit log with `journalctl _TRANSPORT="audit" -g 'apparmor="ALLOWED"'` and add other access as needed
     # Remember to remove the `complain` flag when you are done
-    /usr/bin/my_program r,
     /bin/bash rix,
     /bin/echo ix,
     /etc/passwd r,
     /dev/tty rw,
-    /rehau_gw rx,
+    /src/** rx,
   }
 }
