@@ -19,6 +19,7 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
   /etc/cont-finish.d/** rwix,
   /run/{,**} rwk,
   /dev/** rw,
+  /src/** rx,
 
   # Bashio
   /usr/lib/bashio/** ix,
@@ -35,6 +36,9 @@ profile rehau_neasmart_gateway flags=(attach_disconnected,mediate_deleted) {
 
     # Receive signals from S6-Overlay
     signal (receive) peer=*_rehau_neasmart_gateway,
+    file,
+    capability net_bind_service,
+    network inet raw,
 
     # Access to options.json and other files within your addon
     /data/** rw,
