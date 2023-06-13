@@ -37,7 +37,10 @@ class LockingPersistentDataBlock(ModbusSequentialDataBlock):
 
     def setValues(self, address, value):
         with self.lock:
-            self.reg_dict[address] = value
+            if not isinstance(value, list):
+                value = [value]
+            for k in range(0, len(value)):
+                self.reg_dict[address + k] = value[k]
             super().setValues(address, value)
 
     def getValues(self, address, count=1):
@@ -55,10 +58,12 @@ class LockingPersistentDataBlock(ModbusSequentialDataBlock):
             init_dict.commit()
             init_dict.close()
 
-        _logger.info("Using DB at {}".format(reg_datastore_path))
+        _logger.warning("Using DB at {}".format(reg_datastore_path))
         cls.reg_dict = SqliteDict(reg_datastore_path, tablename=const.SQLITEDICT_REGS_TABLE, autocommit=True)
 
-        return cls(0x00, list(cls.reg_dict.values()))
+        sorted_dict = dict(sorted(cls.reg_dict.iteritems(), key=lambda x: int(x[0])))
+
+        return cls(const.REGS_STARTING_ADDR, list(sorted_dict.values()))
 
 
 def setup_server_context(datastore_path):
