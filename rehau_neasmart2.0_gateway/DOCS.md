@@ -19,3 +19,5 @@ This Add-On supports persistent storage (static size at around 3M) for registers
 - The addon on first startup will init an empty database so all write regs will be zeroed, a change on write regs is required to start showing those values in reading
 - If the addon is down and a change happens through other means (eg. app, thermostat) the register won't be updated and on addon restart the old value will be re-read through the bus and the change will be invalidated
 - SQLITE is not the best for very slow disks, network disk (if missing `flock()`) and SD Cards (writes happening at every registers update can kill them)
+- Flask development server
+- API Auth & Ingress
