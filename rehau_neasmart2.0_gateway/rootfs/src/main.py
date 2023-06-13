@@ -181,15 +181,20 @@ def zone(base_id=None, zone_id=None):
                 mimetype='application/json'
             )
         if op_state:
+            if not isinstance(op_state, list):
+                op_state = [op_state]
             context[slave_id].setValues(
                 const.READ_HR_CODE,
                 zone_addr,
                 op_state)
         if setpoint:
+            dpt_9001_setpoint = dpt_9001.pack_dpt9001(setpoint)
+            if not isinstance(dpt_9001_setpoint, list):
+                dpt_9001_setpoint = [dpt_9001_setpoint]
             context[slave_id].setValues(
                 const.READ_HR_CODE,
                 zone_addr + const.ZONE_SETPOINT_ADDR_OFFSET,
-                dpt_9001.pack_dpt9001(setpoint))
+                dpt_9001_setpoint)
         response = app.response_class(
             status=202
         )
@@ -306,6 +311,8 @@ def mode():
                 status=400,
                 mimetype='application/json'
             )
+        if not isinstance(op_mode, list):
+            op_mode = [op_mode]
         context[slave_id].setValues(
             const.WRITE_HR_CODE,
             const.GLOBAL_OP_MODE_ADDR,
@@ -347,6 +354,8 @@ def state():
                 status=400,
                 mimetype='application/json'
             )
+        if not isinstance(op_state, list):
+            op_state = [op_state]
         context[slave_id].setValues(
             const.WRITE_HR_CODE,
             const.GLOBAL_OP_STATE_ADDR,
