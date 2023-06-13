@@ -1,5 +1,8 @@
 # Rehau Neasmart 2.0 Gateway Add-On
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/matteomanzoni)
+
+
 This Add-On simulates a Modbus slave through serial or ModbusTCP in order to iteract with a Rehau Neasmart 2.0 system, it exposes a set of RESTful apis to control the systems through an Homeassistant custom component.
 
 This Add-On requires a Serial to USB adapter or a ModbusRTU Slave to ModbusTCP adapter. (ModbusRTU over TCP or ModbusRTU over UDP can be supported but are not at this time)
