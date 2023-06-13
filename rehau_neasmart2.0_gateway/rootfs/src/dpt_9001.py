@@ -24,8 +24,8 @@ def pack_dpt9001(f):
 
     mantissa = signed_mantissa
 
-    buffer[0] |= (mantissa >> 8) & 7
-    buffer[1] |= mantissa
+    buffer[0] |= ((mantissa >> 8) & 7) & 0xFF
+    buffer[1] |= mantissa & 0xFF
 
     return struct.unpack('>H', buffer)[0]
 
