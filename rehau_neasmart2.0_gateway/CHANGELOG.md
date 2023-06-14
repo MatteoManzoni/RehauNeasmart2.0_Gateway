@@ -1,3 +1,7 @@
+## 0.2.4
+
+- Consolidate usage of singular v plural
+
 ## 0.2.3
 
 - Consolidate meaning of state v status 

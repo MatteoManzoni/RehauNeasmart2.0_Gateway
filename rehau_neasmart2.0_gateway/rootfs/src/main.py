@@ -367,7 +367,7 @@ def state():
     return response
 
 
-@app.route("/dehumidifier/<int:dehumidifier_id>", methods=['GET'])
+@app.route("/dehumidifiers/<int:dehumidifier_id>", methods=['GET'])
 def get_dehumidifier(dehumidifier_id=None):
     if dehumidifier_id > 9 or dehumidifier_id < 1:
         return app.response_class(
