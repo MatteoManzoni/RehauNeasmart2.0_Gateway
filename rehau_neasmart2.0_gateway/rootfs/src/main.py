@@ -211,7 +211,7 @@ def get_mixed_circuit(group_id=None):
             mimetype='application/json'
         )
     data = {
-        "pump_status": context[slave_id].getValues(
+        "pump_state": context[slave_id].getValues(
             const.READ_HR_CODE,
             const.MIXEDGROUP_BASE_REG[group_id] + const.MIXEDGROUP_PUMP_STATE_OFFSET,
             count=1)[0],
@@ -376,7 +376,7 @@ def get_dehumidifier(dehumidifier_id=None):
             mimetype='application/json'
         )
     data = {
-        "dehumidifier_status": context[slave_id].getValues(
+        "dehumidifier_state": context[slave_id].getValues(
             const.READ_HR_CODE,
             dehumidifier_id + const.DEHUMIDIFIERS_ADDR_OFFSET,
             count=1)[0],
@@ -399,7 +399,7 @@ def get_extra_pumps(pump_id=None):
             mimetype='application/json'
         )
     data = {
-        "dehumidifier_status": context[slave_id].getValues(
+        "pump_state": context[slave_id].getValues(
             const.READ_HR_CODE,
             pump_id + const.EXTRA_PUMPS_ADDR_OFFSET,
             count=1)[0],
