@@ -211,10 +211,10 @@ def get_mixed_circuit(group_id=None):
             mimetype='application/json'
         )
     data = {
-        "pump_running": context[slave_id].getValues(
+        "pump_status": context[slave_id].getValues(
             const.READ_HR_CODE,
             const.MIXEDGROUP_BASE_REG[group_id] + const.MIXEDGROUP_PUMP_STATE_OFFSET,
-            count=1)[0] == 1,
+            count=1)[0],
         "mixing_valve_opening_percentage": context[slave_id].getValues(
             const.READ_HR_CODE,
             const.MIXEDGROUP_BASE_REG[group_id] + const.MIXEDGROUP_VALVE_OPENING_OFFSET,
@@ -376,10 +376,10 @@ def get_dehumidifier(dehumidifier_id=None):
             mimetype='application/json'
         )
     data = {
-        "dehumidifier_running": context[slave_id].getValues(
+        "dehumidifier_status": context[slave_id].getValues(
             const.READ_HR_CODE,
             dehumidifier_id + const.DEHUMIDIFIERS_ADDR_OFFSET,
-            count=1)[0] == 1,
+            count=1)[0],
     }
 
     response = app.response_class(
@@ -399,10 +399,10 @@ def get_extra_pumps(pump_id=None):
             mimetype='application/json'
         )
     data = {
-        "dehumidifier_running": context[slave_id].getValues(
+        "dehumidifier_status": context[slave_id].getValues(
             const.READ_HR_CODE,
             pump_id + const.EXTRA_PUMPS_ADDR_OFFSET,
-            count=1)[0] == 1,
+            count=1)[0],
     }
 
     response = app.response_class(
