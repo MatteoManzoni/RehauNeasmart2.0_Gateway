@@ -182,7 +182,7 @@ def zone(base_id=None, zone_id=None):
                 zone_addr,
                 op_state)
         if setpoint is not None:
-            if (type(setpoint) is not int and type(setpoint) is not float) or op_state == 0 or op_state > 6:
+            if type(setpoint) is not int and type(setpoint) is not float:
                 return app.response_class(
                     response=json.dumps({"err": "invalid setpoint"}),
                     status=400,
