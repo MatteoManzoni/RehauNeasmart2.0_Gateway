@@ -1,3 +1,7 @@
+## 0.2.5
+
+- Fix POST endpoint set zone op_status temperature target 
+
 ## 0.2.4
 
 - Consolidate usage of singular v plural

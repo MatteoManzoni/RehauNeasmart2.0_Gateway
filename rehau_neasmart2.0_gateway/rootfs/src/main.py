@@ -162,32 +162,32 @@ def zone(base_id=None, zone_id=None):
         payload = request.json
         op_state = payload.get("state")
         setpoint = payload.get("setpoint")
-        if not op_state and not setpoint:
+        if op_state is None and setpoint is None:
             return app.response_class(
                 response=json.dumps({"err": "one of state or setpoint need to be specified"}),
                 status=400,
                 mimetype='application/json'
             )
-        if type(op_state) is not int or op_state == 0 or op_state > 6:
-            return app.response_class(
-                response=json.dumps({"err": "invalid state"}),
-                status=400,
-                mimetype='application/json'
-            )
-        if (type(setpoint) is not int and type(setpoint) is not float) or op_state == 0 or op_state > 6:
-            return app.response_class(
-                response=json.dumps({"err": "invalid setpoint"}),
-                status=400,
-                mimetype='application/json'
-            )
-        if op_state:
+        if op_state is not None:
+            if type(op_state) is not int or op_state == 0 or op_state > 6:
+                return app.response_class(
+                    response=json.dumps({"err": "invalid state"}),
+                    status=400,
+                    mimetype='application/json'
+                )
             if not isinstance(op_state, list):
                 op_state = [op_state]
             context[slave_id].setValues(
                 const.READ_HR_CODE,
                 zone_addr,
                 op_state)
-        if setpoint:
+        if setpoint is not None:
+            if (type(setpoint) is not int and type(setpoint) is not float) or op_state == 0 or op_state > 6:
+                return app.response_class(
+                    response=json.dumps({"err": "invalid setpoint"}),
+                    status=400,
+                    mimetype='application/json'
+                )
             dpt_9001_setpoint = dpt_9001.pack_dpt9001(setpoint)
             if not isinstance(dpt_9001_setpoint, list):
                 dpt_9001_setpoint = [dpt_9001_setpoint]
@@ -195,6 +195,7 @@ def zone(base_id=None, zone_id=None):
                 const.READ_HR_CODE,
                 zone_addr + const.ZONE_SETPOINT_ADDR_OFFSET,
                 dpt_9001_setpoint)
+
         response = app.response_class(
             status=202
         )
