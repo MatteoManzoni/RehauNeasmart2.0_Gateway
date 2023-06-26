@@ -8,7 +8,7 @@ This Add-On supports persistent storage (static size at around 3M) for registers
 
 ## How to use
 
-- Configure your Serial to USB adapter or a ModbusRTU Slave to ModbusTCP adapter.
+- Configure your Serial to USB adapter or a ModbusRTU Slave to ModbusTCP adapter. [Here's the how-to for the waveshare RS485 TO POE ETH (B)](./waveshare_poegw_howto.md)
 - Install the addon by adding this addon repository to you homeassistant installation
 - Configure the addon specifying the Serial port path or listening address in the `listening_address` field, configure a `listening_port` matching the ModbusRTU Slave to ModbusTCP adapter configuration 
 - Configure whether to use `tcp` or `serial` as `server_type` (if you have specified a Serial port in the listening address you'll need to use serial)
