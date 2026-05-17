@@ -5,7 +5,6 @@ description: Shim between Rehau Neasmart 2.0 Modbus RTU-Serial/TCP and REST
 url: "https://github.com/matteomanzoni/rehauneasmart2.0_gateway/blob/main/rehau_neasmart2.0_gateway"
 arch:
   - armv7
-  - armhf
   - aarch64
   - amd64
 init: false
