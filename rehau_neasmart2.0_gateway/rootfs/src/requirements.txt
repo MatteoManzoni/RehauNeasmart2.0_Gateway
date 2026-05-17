@@ -1,3 +1,4 @@
 pymodbus~=3.3.1
 Flask~=2.3.2
+waitress~=3.0.0
 sqlitedict~=2.1.0

@@ -25,6 +25,7 @@ from pymodbus.server import (
     StartAsyncTcpServer,
 )
 from flask import Flask, request
+from waitress import serve
 from sqlitedict import SqliteDict
 
 app = Flask(__name__)
@@ -573,7 +574,7 @@ if __name__ == "__main__":
     context, datablock = setup_server_context(const.DATASTORE_PATH, slave_ids)
     _logger.info("Listening for Rehau Modbus slave ids: %s", slave_ids)
 
-    server_thread = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0'}, daemon=True)
+    server_thread = threading.Thread(target=serve, args=(app,), kwargs={'host': '0.0.0.0', 'port': 5000, 'threads': 8}, daemon=True)
     server_thread.start()
 
     if server_type == "tcp":
