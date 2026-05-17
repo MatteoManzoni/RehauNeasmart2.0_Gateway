@@ -1,5 +1,9 @@
 import struct
 
+INVALID_DPT9001_REGISTERS = {0x7FFF}
+MIN_REASONABLE_TEMPERATURE = -50
+MAX_REASONABLE_TEMPERATURE = 120
+
 
 def pack_dpt9001(f):
     buffer = bytearray([0, 0])
@@ -43,3 +47,14 @@ def unpack_dpt9001(i):
     f = 0.01 * float(m) * float(1 << e)
 
     return round(f, 2)
+
+
+def unpack_temperature(i):
+    if i in INVALID_DPT9001_REGISTERS:
+        return None
+
+    value = unpack_dpt9001(i)
+    if value < MIN_REASONABLE_TEMPERATURE or value > MAX_REASONABLE_TEMPERATURE:
+        return None
+
+    return value

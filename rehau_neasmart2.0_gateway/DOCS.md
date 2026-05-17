@@ -12,7 +12,15 @@ This Add-On supports persistent storage (static size at around 3M) for registers
 - Install the addon by adding this addon repository to you homeassistant installation
 - Configure the addon specifying the Serial port path or listening address in the `listening_address` field, configure a `listening_port` matching the ModbusRTU Slave to ModbusTCP adapter configuration 
 - Configure whether to use `tcp` or `serial` as `server_type` (if you have specified a Serial port in the listening address you'll need to use serial)
-- Configure a `slave_id` valid ids are 240 and 241. This addon can co-exist with the KNX GW albeit a different ID
+- Configure `slave_ids` if needed. The default is `[240, 241]` because the Rehau base may poll both documented gateway IDs while broadcasting measurements on unit `0`. The legacy `slave_id` option is still accepted for older configurations.
+- Optionally tune `registers_stale_after_seconds` to control how long previously persisted register values are considered fresh after the last Modbus write. When the timeout is exceeded, the REST API exposes the data as stale so the Home Assistant integration can mark entities unavailable instead of showing frozen values.
+- `persist_command_registers` defaults to `false` and should usually stay that way. This prevents zone/global command registers from being restored from the SQLite cache after a restart, which can otherwise re-apply old presets or setpoints.
+- `command_sync_timeout_seconds` controls how long a REST/HA command write is protected from older Modbus broadcast writes while waiting for the Rehau base to read it.
+
+## Health endpoint
+
+- `GET /health` now returns JSON including `registers_receiving_updates`, `registers_stale`, `registers_age_seconds`, `last_register_write`, `stale_after_seconds`, `persist_command_registers`, `command_sync_timeout_seconds`, and `pending_command_registers`
+- Every REST response also includes the freshness headers `X-Rehau-Registers-Stale`, `X-Rehau-Registers-Age-Seconds`, and `X-Rehau-Last-Register-Write`
 
 ## Known issues
 
