@@ -8,7 +8,6 @@ arch:
   - armhf
   - aarch64
   - amd64
-  - i386
 init: false
 uart: true
 startup: services
