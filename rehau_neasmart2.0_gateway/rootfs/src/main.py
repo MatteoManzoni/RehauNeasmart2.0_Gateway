@@ -4,6 +4,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import threading
 import time
 from datetime import datetime, timezone
@@ -34,6 +35,88 @@ _logger = logging.getLogger(__name__)
 _logger.setLevel(logging.INFO)
 
 
+class PymodbusSysbusNoiseFilter(logging.Filter):
+    """Suppress only known proprietary SYSBUS frames rejected by pymodbus."""
+
+    _missing_slave_pattern = re.compile(
+        r"^requested slave does not exist: (?P<slave_id>\d+)$"
+    )
+    _short_frame_pattern = re.compile(
+        r"^Unknown exception \"unpack requires a buffer of \d+ bytes\" on stream "
+    )
+
+    def __init__(self, configured_slave_ids):
+        super().__init__()
+        self.configured_slave_ids = frozenset(configured_slave_ids)
+        self._lock = threading.Lock()
+        self._suppressed_missing_slave = 0
+        self._suppressed_short_frame = 0
+
+    def filter(self, record):
+        message = record.getMessage()
+        missing_slave = self._missing_slave_pattern.match(message)
+        if missing_slave is not None:
+            slave_id = int(missing_slave.group("slave_id"))
+            if slave_id not in self.configured_slave_ids:
+                self._increment("missing_slave")
+                return False
+
+        if self._short_frame_pattern.match(message):
+            self._increment("short_frame")
+            return False
+
+        return True
+
+    def _increment(self, kind):
+        with self._lock:
+            if kind == "missing_slave":
+                self._suppressed_missing_slave += 1
+            else:
+                self._suppressed_short_frame += 1
+
+    def stats(self):
+        with self._lock:
+            missing_slave = self._suppressed_missing_slave
+            short_frame = self._suppressed_short_frame
+        return {
+            "enabled": True,
+            "missing_slave": missing_slave,
+            "short_frame": short_frame,
+            "total": missing_slave + short_frame,
+        }
+
+
+_pymodbus_noise_filter = None
+
+
+def configure_pymodbus_logging(slave_ids, suppress_sysbus_noise):
+    """Configure the narrow logging filter used for multi-base SYSBUS noise."""
+    global _pymodbus_noise_filter
+
+    pymodbus_logger = logging.getLogger("pymodbus.logging")
+    if _pymodbus_noise_filter is not None:
+        pymodbus_logger.removeFilter(_pymodbus_noise_filter)
+        _pymodbus_noise_filter = None
+
+    if not suppress_sysbus_noise:
+        return
+
+    _pymodbus_noise_filter = PymodbusSysbusNoiseFilter(slave_ids)
+    pymodbus_logger.addFilter(_pymodbus_noise_filter)
+
+
+def pymodbus_noise_stats():
+    """Return observable counters for filtered proprietary SYSBUS messages."""
+    if _pymodbus_noise_filter is None:
+        return {
+            "enabled": False,
+            "missing_slave": 0,
+            "short_frame": 0,
+            "total": 0,
+        }
+    return _pymodbus_noise_filter.stats()
+
+
 class LockingPersistentDataBlock(ModbusSequentialDataBlock):
     lock = threading.Lock()
     reg_dict = None
@@ -43,6 +126,8 @@ class LockingPersistentDataBlock(ModbusSequentialDataBlock):
     command_sync_timeout_seconds = const.DEFAULT_COMMAND_SYNC_TIMEOUT_SECONDS
     command_registers = set()
     pending_command_registers = {}
+    startup_global_mode = const.DEFAULT_STARTUP_GLOBAL_MODE
+    startup_global_state = const.DEFAULT_STARTUP_GLOBAL_STATE
 
     def setValues(self, address, value):
         self.set_modbus_values(address, value)
@@ -188,14 +273,28 @@ class LockingPersistentDataBlock(ModbusSequentialDataBlock):
             if register in cls.pending_command_registers:
                 del cls.pending_command_registers[register]
 
-    def clear_command_registers(self):
-        if self.__class__.persist_command_registers:
-            return
+    def initialize_command_registers(self, startup_global_mode, startup_global_state):
+        """Clear unsafe cached commands and apply explicit global defaults."""
+        self.__class__.startup_global_mode = startup_global_mode
+        self.__class__.startup_global_state = startup_global_state
+
         with self.lock:
-            for register in self.__class__.command_registers:
-                super().setValues(register, [0])
-                self.reg_dict[register] = 0
+            if not self.__class__.persist_command_registers:
+                for register in self.__class__.command_registers:
+                    super().setValues(register, [0])
+                    self.reg_dict[register] = 0
             self.__class__.pending_command_registers = {}
+
+        if startup_global_mode:
+            self.set_rest_values(
+                const.GLOBAL_OP_MODE_ADDR,
+                [startup_global_mode],
+            )
+        if startup_global_state:
+            self.set_rest_values(
+                const.GLOBAL_OP_STATE_ADDR,
+                [startup_global_state],
+            )
 
     @classmethod
     def freshness_info(cls):
@@ -207,7 +306,9 @@ class LockingPersistentDataBlock(ModbusSequentialDataBlock):
                 "stale_after_seconds": cls.stale_after_seconds,
                 "persist_command_registers": cls.persist_command_registers,
                 "command_sync_timeout_seconds": cls.command_sync_timeout_seconds,
-                "pending_command_registers": 0,
+                "pending_command_registers": len(cls.pending_command_registers),
+                "startup_global_mode": cls.startup_global_mode,
+                "startup_global_state": cls.startup_global_state,
             }
 
         age_seconds = round(time.time() - cls.last_bus_write_ts, 3)
@@ -223,6 +324,8 @@ class LockingPersistentDataBlock(ModbusSequentialDataBlock):
             "persist_command_registers": cls.persist_command_registers,
             "command_sync_timeout_seconds": cls.command_sync_timeout_seconds,
             "pending_command_registers": len(cls.pending_command_registers),
+            "startup_global_mode": cls.startup_global_mode,
+            "startup_global_state": cls.startup_global_state,
         }
 
 
@@ -275,9 +378,44 @@ def parse_slave_ids(config):
     return slave_ids
 
 
-def setup_server_context(datastore_path, slave_ids):
+def parse_startup_defaults(config):
+    """Parse optional global startup defaults without accepting unsafe values."""
+    configured_mode = config.get(
+        "startup_global_mode",
+        const.DEFAULT_STARTUP_GLOBAL_MODE,
+    )
+    configured_state = config.get(
+        "startup_global_state",
+        const.DEFAULT_STARTUP_GLOBAL_STATE,
+    )
+    startup_global_mode = int(
+        const.DEFAULT_STARTUP_GLOBAL_MODE
+        if configured_mode is None
+        else configured_mode
+    )
+    startup_global_state = int(
+        const.DEFAULT_STARTUP_GLOBAL_STATE
+        if configured_state is None
+        else configured_state
+    )
+    if not 0 <= startup_global_mode <= 5:
+        raise ValueError("startup_global_mode must be between 0 and 5")
+    if not 0 <= startup_global_state <= 6:
+        raise ValueError("startup_global_state must be between 0 and 6")
+    return startup_global_mode, startup_global_state
+
+
+def setup_server_context(
+    datastore_path,
+    slave_ids,
+    startup_global_mode=const.DEFAULT_STARTUP_GLOBAL_MODE,
+    startup_global_state=const.DEFAULT_STARTUP_GLOBAL_STATE,
+):
     datablock = LockingPersistentDataBlock.create_lpdb(datastore_path)
-    datablock.clear_command_registers()
+    datablock.initialize_command_registers(
+        startup_global_mode,
+        startup_global_state,
+    )
     slave_context = {
         slave_id: RehauModbusSlaveContext(
             di=None,
@@ -344,6 +482,7 @@ async def run_modbus_server(server_context, server_addr, conn_type):
             identity=identity,
             port=server_addr,
             framer=ModbusRtuFramer,
+            baudrate=const.NEASMART_SYSBUS_BAUD,
             stopbits=const.NEASMART_SYSBUS_STOP_BITS,
             bytesize=const.NEASMART_SYSBUS_DATA_BITS,
             parity=const.NEASMART_SYSBUS_PARITY,
@@ -354,9 +493,9 @@ async def run_modbus_server(server_context, server_addr, conn_type):
 
 @app.route("/zones/<int:base_id>/<int:zone_id>", methods=['POST', 'GET'])
 def zone(base_id=None, zone_id=None):
-    if base_id > 4 or base_id < 1:
+    if base_id > const.MAX_BASES or base_id < 1:
         return json_response({"err": "invalid base id"}, status=400)
-    if zone_id > 12 or zone_id < 1:
+    if zone_id > const.MAX_ZONES_PER_BASE or zone_id < 1:
         return json_response({"err": "invalid zone id"}, status=400)
 
     zone_addr = (base_id - 1) * const.NEASMART_BASE_SLAVE_ADDR + zone_id * const.BASE_ZONE_ID
@@ -542,6 +681,7 @@ def get_health():
         {
             "status": "ok",
             "registers_receiving_updates": not freshness["registers_stale"],
+            "pymodbus_sysbus_noise": pymodbus_noise_stats(),
             **freshness,
         }
     )
@@ -567,11 +707,22 @@ if __name__ == "__main__":
             "command_sync_timeout_seconds",
             const.DEFAULT_COMMAND_SYNC_TIMEOUT_SECONDS,
         )
+        startup_global_mode, startup_global_state = parse_startup_defaults(config)
+        suppress_sysbus_noise = config.get(
+            "suppress_sysbus_noise",
+            const.DEFAULT_SUPPRESS_SYSBUS_NOISE,
+        )
 
     LockingPersistentDataBlock.configure_staleness(registers_stale_after_seconds)
     LockingPersistentDataBlock.configure_command_registers(persist_command_registers)
     LockingPersistentDataBlock.configure_command_sync_timeout(command_sync_timeout_seconds)
-    context, datablock = setup_server_context(const.DATASTORE_PATH, slave_ids)
+    configure_pymodbus_logging(slave_ids, suppress_sysbus_noise)
+    context, datablock = setup_server_context(
+        const.DATASTORE_PATH,
+        slave_ids,
+        startup_global_mode,
+        startup_global_state,
+    )
     _logger.info("Listening for Rehau Modbus slave ids: %s", slave_ids)
 
     server_thread = threading.Thread(target=serve, args=(app,), kwargs={'host': '0.0.0.0', 'port': 5000, 'threads': 8}, daemon=True)

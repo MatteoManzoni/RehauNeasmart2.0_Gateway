@@ -1,3 +1,11 @@
+## 0.3.0
+
+- Support the complete documented topology of one master plus four slave bases (60 zones)
+- Treat REHAU standby setpoint sentinel `0x8116` as missing instead of `-17.7 C`
+- Add optional `startup_global_mode` and `startup_global_state` values for installations where REHAU does not republish global registers after a gateway restart
+- Suppress only known proprietary multi-base SYSBUS framing errors by default and expose suppression counters through `/health`
+- Add regression tests for stale command replay, startup defaults, fifth-base addressing, invalid temperatures, and SYSBUS log filtering
+
 ## 0.2.9
 
 - Listen on both documented Rehau gateway unit IDs (`240` and `241`) by default so pymodbus does not discard one half of the base-unit polling cycle

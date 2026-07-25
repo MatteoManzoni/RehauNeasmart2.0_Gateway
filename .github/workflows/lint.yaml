@@ -1,5 +1,8 @@
 name: Lint
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -18,7 +21,7 @@ jobs:
       addons: ${{ steps.addons.outputs.addons_list }}
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v4
 
       - name: 🔍 Find add-on directories
         id: addons
@@ -33,7 +36,7 @@ jobs:
         path: ${{ fromJson(needs.find.outputs.addons) }}
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v4
 
       - name: 🚀 Run Home Assistant Add-on Lint
         uses: frenck/action-addon-linter@v2.13

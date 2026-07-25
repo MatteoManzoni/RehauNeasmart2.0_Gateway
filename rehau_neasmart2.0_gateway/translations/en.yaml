@@ -1,4 +1,10 @@
 configuration:
-  message:
-    name: Message
-    description: The message that will be printed to the log when starting this example add-on.
+  startup_global_mode:
+    name: Startup global mode
+    description: 0 leaves the mode unset; 1-5 applies that REHAU mode on startup.
+  startup_global_state:
+    name: Startup global state
+    description: 0 leaves the state unset; 1-6 applies that REHAU state on startup.
+  suppress_sysbus_noise:
+    name: Suppress known SYSBUS noise
+    description: Hide only known proprietary multi-base frames from pymodbus logs while retaining counters in the health endpoint.

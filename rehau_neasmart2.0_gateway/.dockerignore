@@ -1,0 +1,5 @@
+rootfs/.DS_Store
+rootfs/.idea
+rootfs/src/venv
+**/__pycache__
+**/*.pyc

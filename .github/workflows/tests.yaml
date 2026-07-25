@@ -1,0 +1,38 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r rehau_neasmart2.0_gateway/rootfs/src/requirements.txt pytest ruff==0.15.21
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Lint Python
+        run: ruff check rehau_neasmart2.0_gateway/rootfs/src tests
+
+      - name: Compile source
+        run: python -m compileall -q rehau_neasmart2.0_gateway/rootfs/src tests

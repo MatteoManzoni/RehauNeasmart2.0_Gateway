@@ -1,14 +1,11 @@
 name: Rehau Neasmart 2.0 Gateway
-version: "0.2.9"
+version: "0.3.0"
 slug: rehau_neasmart_gateway
 description: Shim between Rehau Neasmart 2.0 Modbus RTU-Serial/TCP and REST
 url: "https://github.com/matteomanzoni/rehauneasmart2.0_gateway/blob/main/rehau_neasmart2.0_gateway"
 arch:
-  - armv7
-  - armhf
   - aarch64
   - amd64
-  - i386
 init: false
 uart: true
 startup: services
@@ -27,6 +24,9 @@ options:
   registers_stale_after_seconds: 180
   persist_command_registers: false
   command_sync_timeout_seconds: 30
+  startup_global_mode: 0
+  startup_global_state: 0
+  suppress_sysbus_noise: true
 schema:
   listen_address: "str?"
   listen_port: "str?"
@@ -37,3 +37,6 @@ schema:
   registers_stale_after_seconds: "int?"
   persist_command_registers: "bool?"
   command_sync_timeout_seconds: "int?"
+  startup_global_mode: "int?"
+  startup_global_state: "int?"
+  suppress_sysbus_noise: "bool?"

@@ -1,6 +1,8 @@
 import struct
 
-INVALID_DPT9001_REGISTERS = {0x7FFF}
+# REHAU uses 0x8116 for an inapplicable standby setpoint and 0x7FFF for
+# uninitialised temperature values. Neither is a real temperature.
+INVALID_DPT9001_REGISTERS = {0x7FFF, 0x8116}
 MIN_REASONABLE_TEMPERATURE = -50
 MAX_REASONABLE_TEMPERATURE = 120
 
@@ -36,9 +38,9 @@ def pack_dpt9001(f):
 
 def unpack_dpt9001(i):
     h = (i >> 8) & 0xFF
-    l = i & 0xFF
+    low_byte = i & 0xFF
 
-    m = (int(h) & 7) << 8 | int(l)
+    m = (int(h) & 7) << 8 | int(low_byte)
     if (h & 0x80) == 0x80:
         m -= 2048
 
