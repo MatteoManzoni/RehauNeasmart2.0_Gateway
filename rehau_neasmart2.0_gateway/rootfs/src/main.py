@@ -481,6 +481,7 @@ async def run_modbus_server(server_context, server_addr, conn_type):
             identity=identity,
             port=server_addr,
             framer=ModbusRtuFramer,
+            baudrate=const.NEASMART_SYSBUS_BAUD,
             stopbits=const.NEASMART_SYSBUS_STOP_BITS,
             bytesize=const.NEASMART_SYSBUS_DATA_BITS,
             parity=const.NEASMART_SYSBUS_PARITY,

@@ -1,3 +1,4 @@
 pymodbus~=3.3.1
 Flask~=2.3.2
 sqlitedict~=2.1.0
+pyserial~=3.5
