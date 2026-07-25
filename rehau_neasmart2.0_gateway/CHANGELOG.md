@@ -1,3 +1,8 @@
+## 0.3.1
+
+- Serve the REST API with Waitress instead of the Flask development server
+- Fix direct serial SYSBUS mode by installing `pyserial` and using the required 38400 baud rate
+
 ## 0.3.0
 
 - Support the complete documented topology of one master plus four slave bases (60 zones)
